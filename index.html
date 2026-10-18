@@ -153,8 +153,13 @@
 
     <div id="ceu-satelites" hidden>
       <svg class="ceu-grafico" id="cupula" role="img" aria-label="O céu visto do local, com os satélites acima do horizonte"></svg>
+      <div class="seletor">
+        <button type="button" class="pilula" id="ceu-lixo" aria-pressed="false">🗑 Lixo espacial</button>
+      </div>
       <p class="ceu-estado" id="estado-satelites">Escolha um local para ver os satélites.</p>
       <ul class="ceu-lista" id="lista-satelites"></ul>
+      <p class="ceu-estado" id="estado-lixo" hidden></p>
+      <ul class="ceu-lista" id="lista-lixo" hidden></ul>
     </div>
 
     <p class="nuvens-legenda">
@@ -162,6 +167,8 @@
       avião transmite, captado por voluntários (adsb.lol) — onde não há antena por perto, ele não aparece.
       <b>Satélites:</b> o céu como uma cúpula — centro = bem em cima da sua cabeça, borda = horizonte;
       o traço mostra os próximos 5 min. A olho nu só se veem no começo da noite ou antes do amanhecer.
+      <b>Lixo espacial</b> (pontos cinza): detritos rastreados, de mais de ~10 cm, de dois testes
+      antissatélite (China 2007, Rússia 2021) e da colisão Iridium × Cosmos (2009) — pequenos demais para ver a olho nu.
       Órbitas: <a href="https://celestrak.org/" target="_blank" rel="noopener">CelesTrak</a>.
     </p>
   </section>

@@ -56,6 +56,11 @@ A imagem chega ao GIBS com uns 20–40 min de atraso; o app procura a mais nova 
 | ✈️ Aviões | radar visto de cima (50 / 150 / 300 km), voo, tipo, altitude, velocidade e direção; a cada 15 s | ADS‑B comunitário: [adsb.lol](https://adsb.lol), reserva airplanes.live e OpenSky |
 | 🛰 Satélites | cúpula do céu (centro = zênite) com os satélites acima do horizonte e o rastro dos próximos 5 min; ISS, Tiangong e Hubble em vermelho | órbitas da [CelesTrak](https://celestrak.org) (grupos `stations` e `visual`), posição calculada no aparelho com [satellite.js](https://github.com/shashwatak/satellite-js) (MIT, em `vendor/`) |
 
+O botão **🗑 Lixo espacial** acrescenta, em cinza, os detritos rastreados dos grupos
+`fengyun-1c-debris`, `cosmos-2251-debris`, `iridium-33-debris` e `cosmos-1408-debris`
+(sem rastro, por serem milhares), com a lista dos mais altos e de que evento vieram.
+A escolha fica guardada no aparelho.
+
 As órbitas ficam guardadas no aparelho por 6 h (a CelesTrak pede que não se baixe
 mais vezes que a atualização deles). Os aviões só são consultados com a seção na
 tela e o app aberto. Onde não há receptor ADS‑B de voluntário por perto, o avião

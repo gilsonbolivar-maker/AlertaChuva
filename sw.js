@@ -7,7 +7,7 @@
 
 importScripts('previsao.js');
 
-const VERSAO = '1.4.0';   // precisa casar com a VERSAO do app.js
+const VERSAO = '1.5.0';   // precisa casar com a VERSAO do app.js
 const CACHE_APP = 'alerta-chuva-app-' + VERSAO;
 
 const ARQUIVOS = [
