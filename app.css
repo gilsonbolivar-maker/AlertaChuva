@@ -230,6 +230,7 @@ a { color: var(--acento-texto); }
   border: 1px solid var(--borda);
 }
 .nuvens img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nuvens .nuvens-ref { position: absolute; inset: 0; pointer-events: none; }
 .nuvens[data-estado="vazio"] img,
 .nuvens[data-estado="erro"] img { visibility: hidden; }
 .nuvens[data-estado="carregando"] img { opacity: .5; }
