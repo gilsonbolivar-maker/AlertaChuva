@@ -1,0 +1,40 @@
+# Publica o Alerta de Chuva no GitHub Pages a cada push na main.
+# A primeira execução liga o Pages sozinha (configure-pages com enablement),
+# então não é preciso mexer em Settings.
+name: Publicar no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.publicacao.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ligar o Pages, se ainda não estiver
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      # O site é o repositório inteiro.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: publicacao
+        uses: actions/deploy-pages@v4

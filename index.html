@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Alerta de Chuva</title>
+<meta name="description" content="Avisa quando a previsão mostra chuva chegando no seu local.">
+<meta name="theme-color" content="#0b1220">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chuva">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icones/icone-192.png" sizes="192x192">
+<link rel="apple-touch-icon" sizes="180x180" href="icones/icone-180.png">
+<script>
+  // Tema escolhido (Ajustes) aplicado antes de pintar, para não piscar.
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('alerta-chuva:tema'); } catch (e) {}
+    t = t === 'claro' ? 'claro' : 'escuro';
+    document.documentElement.dataset.tema = t;
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute('content', t === 'claro' ? '#f3f5f9' : '#0b1220');
+  })();
+</script>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="topo">
+  <h1>Alerta de Chuva <small class="versao-app" data-versao></small></h1>
+  <p class="estado" id="estado" role="status" aria-live="polite">Desligado</p>
+</header>
+
+<main class="tela">
+  <!-- ————————————————— local ————————————————— -->
+  <section class="local">
+    <p class="rotulo">Local</p>
+    <p class="local-nome" id="local-nome">Nenhum local escolhido</p>
+    <div class="local-botoes">
+      <button class="botao discreto" id="btn-gps" type="button">◎ Minha localização</button>
+      <button class="botao discreto" id="btn-mostrar-busca" type="button">Buscar cidade</button>
+    </div>
+    <div class="busca" id="busca-caixa" hidden>
+      <input type="search" id="busca" placeholder="Nome da cidade" autocomplete="off" enterkeyhint="search">
+      <button class="botao discreto" id="btn-buscar" type="button">Buscar</button>
+    </div>
+    <ul class="resultados" id="resultados" hidden></ul>
+  </section>
+
+  <!-- ————————————————— previsão ————————————————— -->
+  <section class="painel" id="painel" data-nivel="nada">
+    <p class="painel-icone" id="painel-icone" aria-hidden="true">☁</p>
+    <p class="painel-titulo" id="painel-titulo">Escolha um local</p>
+    <p class="painel-texto" id="painel-texto">A previsão aparece aqui.</p>
+    <dl class="detalhes">
+      <div><dt>Agora</dt><dd id="d-agora">—</dd></div>
+      <div><dt>Chance máx.</dt><dd id="d-chance">—</dd></div>
+      <div><dt>Atualizado</dt><dd id="d-idade">—</dd></div>
+    </dl>
+  </section>
+
+  <section class="tempo-caixa">
+    <h2>Tempo agora</h2>
+    <div class="tempo">
+      <div class="cartao">
+        <p class="cartao-rotulo">🌡 Temperatura</p>
+        <p class="cartao-valor" id="t-temp">—</p>
+        <p class="cartao-nota" id="t-temp-nota">—</p>
+      </div>
+      <div class="cartao">
+        <p class="cartao-rotulo">💧 Umidade do ar</p>
+        <p class="cartao-valor" id="t-umidade">—</p>
+        <p class="cartao-nota" id="t-umidade-nota">—</p>
+      </div>
+      <div class="cartao">
+        <p class="cartao-rotulo">☀ Índice UV</p>
+        <p class="cartao-valor" id="t-uv">—</p>
+        <p class="cartao-nota" id="t-uv-nota">—</p>
+      </div>
+      <div class="cartao">
+        <p class="cartao-rotulo">💨 Vento</p>
+        <p class="cartao-valor" id="t-vento">—</p>
+        <p class="cartao-nota" id="t-vento-nota">—</p>
+      </div>
+      <div class="cartao">
+        <p class="cartao-rotulo">🌅 Nascer do sol</p>
+        <p class="cartao-valor" id="t-sol">—</p>
+        <p class="cartao-nota" id="t-sol-nota">—</p>
+      </div>
+      <div class="cartao">
+        <p class="cartao-rotulo">🌙 Lua</p>
+        <p class="cartao-valor" id="t-lua">—</p>
+        <p class="cartao-nota" id="t-lua-nota">—</p>
+      </div>
+      <div class="cartao largo" id="c-granizo" data-risco="baixo">
+        <p class="cartao-rotulo">🧊 Granizo</p>
+        <p class="cartao-valor" id="t-granizo">—</p>
+        <p class="cartao-nota" id="t-granizo-nota">—</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="horas-caixa">
+    <h2>Próximas 12 horas</h2>
+    <ol class="horas" id="horas"></ol>
+  </section>
+
+  <button class="botao principal largo" id="btn-vigiar" type="button">Ligar alerta</button>
+  <button class="botao discreto largo" id="btn-atualizar" type="button">Atualizar agora</button>
+
+  <!-- ————————————————— ajustes ————————————————— -->
+  <section class="ajustes">
+    <h2>Ajustes</h2>
+    <label class="campo">
+      <span>Avisar se houver chuva nas próximas <b id="janela-valor">2 h</b></span>
+      <input type="range" id="janela" min="1" max="6" step="1" value="2">
+    </label>
+    <label class="campo">
+      <span>Com chance de pelo menos <b id="chance-valor">60%</b></span>
+      <input type="range" id="chance" min="20" max="90" step="10" value="60">
+    </label>
+    <label class="opcao"><input type="checkbox" id="opt-som" checked><span>Tocar som</span></label>
+    <label class="opcao"><input type="checkbox" id="opt-vibrar" checked><span>Vibrar</span></label>
+    <label class="opcao"><input type="checkbox" id="opt-tela"><span>Manter a tela ligada enquanto vigia</span></label>
+    <div class="tema" role="group" aria-labelledby="tema-rotulo">
+      <span id="tema-rotulo">Tema:</span>
+      <button class="tema-opcao" type="button" data-tema-opcao="escuro" aria-pressed="true">Escuro</button>
+      <button class="tema-opcao" type="button" data-tema-opcao="claro" aria-pressed="false">Claro</button>
+    </div>
+    <button class="botao discreto" id="btn-testar" type="button">Testar alerta</button>
+    <button class="botao discreto" id="btn-instalar" type="button" hidden>Instalar no celular</button>
+  </section>
+
+  <details class="ajuda">
+    <summary>Como funciona</summary>
+    <p>O app consulta a previsão do <b>Open‑Meteo</b> a cada 10 minutos para o local
+      escolhido. Se aparecer chuva dentro do prazo e com a chance escolhidos, ele toca um
+      som, vibra e mostra uma notificação.</p>
+    <p>Para a primeira hora ele usa a previsão de <b>15 em 15 minutos</b>, que diz quando a
+      chuva começa; para o resto, a <b>chance por hora</b>.</p>
+    <p>Avisa <b>uma vez por chuva</b>: só volta a tocar depois que a previsão fica seca de novo.</p>
+    <p><b>Granizo</b> não vem pronto na previsão: o app junta a trovoada prevista com a energia
+      do ar (CAPE) dentro do prazo. É um indício, não uma certeza. Com risco alto, o alerta
+      de chuva avisa também do granizo.</p>
+    <p>A <b>fase da lua</b> é calculada no próprio aparelho e funciona sem internet.</p>
+    <p><b>Deixe o app aberto.</b> Um site não roda em segundo plano: com o app fechado ou a
+      tela bloqueada, as consultas param. No Android, instalado pelo Chrome, ele ainda tenta
+      checar de vez em quando sozinho, mas isso fica a critério do sistema.</p>
+    <p><b>Instalar:</b> no Android, “Instalar app” no menu do Chrome. No iPhone e no iPad,
+      Safari → <b>Compartilhar → Adicionar à Tela de Início</b> (só assim o iOS mostra notificações).</p>
+    <p>Previsão é previsão: chuva isolada de verão às vezes escapa. Dados por
+      <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open‑Meteo.com</a> (CC BY 4.0).</p>
+  </details>
+</main>
+
+<!-- ————————————————— alerta ————————————————— -->
+<div class="alerta" id="alerta" hidden>
+  <div class="alerta-caixa">
+    <p class="alerta-icone" aria-hidden="true">☔</p>
+    <p class="alerta-titulo">Vai chover!</p>
+    <p class="alerta-texto" id="alerta-texto">—</p>
+    <button class="botao ok" id="btn-ok" type="button">Entendi</button>
+  </div>
+</div>
+
+<div class="aviso" id="toast" hidden></div>
+
+<script src="previsao.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
