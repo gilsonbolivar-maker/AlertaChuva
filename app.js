@@ -4,7 +4,7 @@
    ———————————————————————————————————————————————————————————— */
 'use strict';
 
-const VERSAO = '1.1.0';   // precisa casar com a VERSAO do sw.js
+const VERSAO = '1.2.0';   // precisa casar com a VERSAO do sw.js
 
 // Versão sempre à vista: cada [data-versao] da página mostra a deste app.
 for (const lugar of document.querySelectorAll('[data-versao]')) lugar.textContent = 'v' + VERSAO;
@@ -264,6 +264,7 @@ async function verificar({ silencioso = false } = {}) {
     ultima = { r, tempo: Previsao.resumirTempo(dados), em: Date.now() };
     desenhar();
     mostrarEstado();
+    if (silencioso) Nuvens.carregar();   // a cada 10 min, junto com a previsão
     await decidirAlerta(r);
   } catch (e) {
     definirEstado(navigator.onLine === false ? 'Sem internet' : 'Previsão indisponível', 'erro');
@@ -438,6 +439,7 @@ function escolherLocal(novo) {
   salvar();
   mostrarLocal();
   mostrarEstado();
+  Nuvens.definirLocal(local);
   el.buscaCaixa.hidden = true;
   el.resultados.hidden = true;
   Previsao.gravarEstado({ avisado: false }).then(() => verificar());
@@ -563,6 +565,8 @@ el.instalar.addEventListener('click', async () => {
 /* ————————————————— início ————————————————— */
 
 mostrarAjustes();
+Nuvens.iniciar();
+Nuvens.definirLocal(local);
 mostrarLocal();
 mostrarEstado();
 salvar();

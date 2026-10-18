@@ -218,8 +218,80 @@ a { color: var(--acento-texto); }
 .cartao[data-risco="alto"] { border-color: var(--perigo); }
 .cartao[data-risco="alto"] .cartao-valor { color: var(--perigo); }
 
+/* ——— nuvens (satélite) ——— */
+.nuvens-caixa { margin-top: 18px; }
+.nuvens {
+  position: relative;
+  margin-top: 10px;
+  aspect-ratio: 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #05080f;
+  border: 1px solid var(--borda);
+}
+.nuvens img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.nuvens[data-estado="vazio"] img,
+.nuvens[data-estado="erro"] img { visibility: hidden; }
+.nuvens[data-estado="carregando"] img { opacity: .5; }
+.nuvens-circulo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px dashed #ffb020;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.nuvens-centro {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background:
+    linear-gradient(#ff4d4d, #ff4d4d) center / 2px 100% no-repeat,
+    linear-gradient(#ff4d4d, #ff4d4d) center / 100% 2px no-repeat;
+  filter: drop-shadow(0 0 2px #000);
+}
+.nuvens-hora {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  margin: 0;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgba(0, 0, 0, .6);
+  color: #fff;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.nuvens-hora:empty { display: none; }
+.nuvens-aviso { margin: 8px 0 0; font-size: 13px; color: var(--alerta); min-height: 0; }
+.nuvens-aviso:empty { display: none; }
+.nuvens-legenda { margin: 8px 0 0; font-size: 12px; color: var(--texto-fraco); }
+.nuvens-legenda b { color: var(--texto); }
+.seletor { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; font-size: 14px; color: var(--texto-fraco); }
+.pilula {
+  appearance: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 99px;
+  border: 1px solid var(--borda);
+  background: transparent;
+  color: var(--texto-fraco);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.pilula[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: #fff; }
+.pilula:disabled { opacity: .45; }
+
 /* ——— barras por hora ——— */
 .horas-caixa { margin-top: 18px; }
+.nuvens-caixa h2,
 .tempo-caixa h2,
 .horas-caixa h2,
 .ajustes h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--texto-fraco); }
