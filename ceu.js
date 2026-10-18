@@ -19,6 +19,15 @@ const Ceu = (() => {
   const CHAVE_TLE = 'alerta-chuva:tle';
   const VALIDADE_TLE = 6 * 3600 * 1000;     // a CelesTrak atualiza a cada ~2 h; pedimos bem menos
   const GRUPOS_TLE = ['stations', 'visual'];
+  // Lixo espacial: os detritos dos grandes eventos que a CelesTrak acompanha em separado.
+  const CHAVE_LIXO = 'alerta-chuva:tle-lixo';
+  const CHAVE_LIXO_LIGADO = 'alerta-chuva:lixo-ligado';
+  const ORIGEM_LIXO = {
+    'fengyun-1c-debris': 'Fengyun‑1C · teste antissatélite chinês, 2007',
+    'cosmos-2251-debris': 'Cosmos 2251 · colisão com o Iridium 33, 2009',
+    'iridium-33-debris': 'Iridium 33 · colisão com o Cosmos 2251, 2009',
+    'cosmos-1408-debris': 'Cosmos 1408 · teste antissatélite russo, 2021'
+  };
   const DESTAQUE = /ISS \(ZARYA\)|CSS \(TIANHE\)|HST/;   // ISS, Tiangong, Hubble
 
   const SVG = 'http://www.w3.org/2000/svg';
@@ -32,6 +41,8 @@ const Ceu = (() => {
   let relogioAvioes = null;
   let relogioSatelites = null;
   let satelites = null;                     // [{ nome, satrec }]
+  let lixo = null;                          // [{ nome, satrec, origem }]
+  let lixoLigado = false;
   let geracao = 0;
 
   function iniciar() {
@@ -46,8 +57,19 @@ const Ceu = (() => {
       estadoAvioes: $('estado-avioes'),
       cupula: $('cupula'),
       listaSatelites: $('lista-satelites'),
-      estadoSatelites: $('estado-satelites')
+      estadoSatelites: $('estado-satelites'),
+      botaoLixo: $('ceu-lixo'),
+      listaLixo: $('lista-lixo'),
+      estadoLixo: $('estado-lixo')
     };
+    try { lixoLigado = localStorage.getItem(CHAVE_LIXO_LIGADO) === '1'; } catch (e) { /* modo privado */ }
+    el.botaoLixo.addEventListener('click', () => {
+      lixoLigado = !lixoLigado;
+      try { localStorage.setItem(CHAVE_LIXO_LIGADO, lixoLigado ? '1' : '0'); } catch (e) { /* modo privado */ }
+      marcarLixo();
+      mostrarSatelites();
+    });
+    marcarLixo();
     for (const b of el.abas) b.addEventListener('click', () => { aba = b.dataset.ceuAba; atualizarTela(); });
     for (const b of el.raios) b.addEventListener('click', () => { raio = Number(b.dataset.ceuRaio); atualizarTela(true); });
 
@@ -251,26 +273,32 @@ const Ceu = (() => {
     return lista;
   }
 
-  async function carregarTle() {
+  /**
+   * Baixa os grupos da CelesTrak (guardados por 6 h em `chave`). Cada item leva
+   * o grupo de onde veio. Com `parcial`, um grupo que falhe não derruba os outros.
+   */
+  async function carregarTle(chave = CHAVE_TLE, grupos = GRUPOS_TLE, parcial = false) {
     let guardado = null;
-    try { guardado = JSON.parse(localStorage.getItem(CHAVE_TLE) || 'null'); } catch (e) { /* modo privado */ }
+    try { guardado = JSON.parse(localStorage.getItem(chave) || 'null'); } catch (e) { /* modo privado */ }
     if (guardado && Date.now() - guardado.em < VALIDADE_TLE) return guardado.lista;
 
     try {
-      const partes = await Promise.all(GRUPOS_TLE.map(g =>
-        fetch(`https://celestrak.org/NORAD/elements/gp.php?GROUP=${g}&FORMAT=tle`).then(r => {
-          if (!r.ok) throw new Error(r.status);
-          return r.text();
-        })));
+      const baixar = g => fetch(`https://celestrak.org/NORAD/elements/gp.php?GROUP=${g}&FORMAT=tle`).then(r => {
+        if (!r.ok) throw new Error(r.status);
+        return r.text();
+      }).then(texto => lerTle(texto).map(s => Object.assign(s, { grupo: g })));
+      const partes = parcial
+        ? (await Promise.allSettled(grupos.map(baixar))).filter(r => r.status === 'fulfilled').map(r => r.value)
+        : await Promise.all(grupos.map(baixar));
       const vistos = new Set();
-      const lista = partes.flatMap(lerTle).filter(s => {
+      const lista = partes.flat().filter(s => {
         const id = s.l1.slice(2, 7);
         if (vistos.has(id)) return false;
         vistos.add(id);
         return true;
       });
       if (!lista.length) throw new Error('vazio');
-      try { localStorage.setItem(CHAVE_TLE, JSON.stringify({ em: Date.now(), lista })); } catch (e) { /* cheio */ }
+      try { localStorage.setItem(chave, JSON.stringify({ em: Date.now(), lista })); } catch (e) { /* cheio */ }
       return lista;
     } catch (e) {
       if (guardado) return guardado.lista;   // velho, mas serve por alguns dias
@@ -286,6 +314,21 @@ const Ceu = (() => {
       try { return { nome: s.nome, satrec: satellite.twoline2satrec(s.l1, s.l2) }; } catch (e) { return null; }
     }).filter(Boolean);
     return satelites;
+  }
+
+  async function prepararLixo() {
+    if (lixo) return lixo;
+    const lista = await carregarTle(CHAVE_LIXO, Object.keys(ORIGEM_LIXO), true);
+    lixo = lista.map(s => {
+      try { return { nome: s.nome, origem: ORIGEM_LIXO[s.grupo] || '', satrec: satellite.twoline2satrec(s.l1, s.l2) }; }
+      catch (e) { return null; }
+    }).filter(Boolean);
+    return lixo;
+  }
+
+  function marcarLixo() {
+    el.botaoLixo.setAttribute('aria-pressed', String(lixoLigado));
+    el.listaLixo.hidden = el.estadoLixo.hidden = !lixoLigado;
   }
 
   /** Azimute e elevação (graus) e altitude (km) de um satélite visto do local. */
@@ -325,6 +368,7 @@ const Ceu = (() => {
     acima.sort((a, b) => b.el - a.el);
 
     fundo(el.cupula, ['60°', '30°', 'horizonte']);
+    if (lixoLigado) await desenharLixo(agora, observador, gmst);   // por baixo dos satélites
     for (const p of acima) {
       const destaque = DESTAQUE.test(p.nome);
       // Rastro dos próximos 5 minutos, para ver para onde vai.
@@ -354,6 +398,40 @@ const Ceu = (() => {
       el.listaSatelites.append(li);
     }
     el.estadoSatelites.textContent = `${acima.length} satélite(s) acima do horizonte agora, de ${satelites.length} acompanhados.`;
+  }
+
+  /** Lixo espacial: pontos cinza, sem rastro (são milhares), e a lista dos mais altos. */
+  async function desenharLixo(agora, observador, gmst) {
+    try {
+      el.estadoLixo.textContent = lixo ? el.estadoLixo.textContent : 'Carregando o lixo espacial…';
+      await prepararLixo();
+    } catch (e) {
+      el.estadoLixo.textContent = 'Não deu para baixar a lista de lixo espacial (CelesTrak).';
+      el.listaLixo.textContent = '';
+      return;
+    }
+    const acima = [];
+    for (const s of lixo) {
+      const p = olhar(s, agora, observador, gmst);
+      if (p && p.el > 0) acima.push(Object.assign({ nome: s.nome, origem: s.origem }, p));
+    }
+    acima.sort((a, b) => b.el - a.el);
+    for (const p of acima) {
+      const [x, y] = posicaoCupula(p.az, p.el);
+      el.cupula.append(no('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: 1.1, class: 'lixo' }));
+    }
+    el.listaLixo.textContent = '';
+    for (const p of acima.slice(0, 8)) {
+      const li = document.createElement('li');
+      li.className = 'lixo';
+      const nome = document.createElement('b');
+      nome.textContent = p.nome.replace(/\s+DEB$/, '') + ' — detrito';
+      const info = document.createElement('span');
+      info.textContent = `${p.origem} · ${Math.round(p.el)}° de altura ao ${pontoCardeal(p.az)} · ${Math.round(p.altKm)} km`;
+      li.append(nome, info);
+      el.listaLixo.append(li);
+    }
+    el.estadoLixo.textContent = `🗑 ${acima.length} pedaço(s) de lixo espacial acima do horizonte agora, de ${lixo.length} acompanhados (pontos cinza).`;
   }
 
   function nomeCurto(n) {

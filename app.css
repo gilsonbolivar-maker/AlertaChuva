@@ -311,6 +311,8 @@ a { color: var(--acento-texto); }
 .ceu-rotulo.destaque { fill: #ff8a80; font-weight: 700; }
 .sat { fill: #8fd3ff; }
 .sat.destaque { fill: #ff4d4d; stroke: #fff; stroke-width: .6; }
+.lixo { fill: rgba(200, 200, 200, .55); }
+.ceu-lista li.lixo { border-style: dashed; }
 .sat-rastro { fill: none; stroke: rgba(143, 211, 255, .45); stroke-width: .6; }
 .sat-rastro.destaque { stroke: rgba(255, 77, 77, .8); stroke-width: 1; }
 .ceu-estado { margin: 8px 0 0; font-size: 13px; color: var(--texto-fraco); }
