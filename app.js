@@ -4,7 +4,7 @@
    ———————————————————————————————————————————————————————————— */
 'use strict';
 
-const VERSAO = '1.3.0';   // precisa casar com a VERSAO do sw.js
+const VERSAO = '1.4.0';   // precisa casar com a VERSAO do sw.js
 
 // Versão sempre à vista: cada [data-versao] da página mostra a deste app.
 for (const lugar of document.querySelectorAll('[data-versao]')) lugar.textContent = 'v' + VERSAO;
@@ -441,6 +441,7 @@ function escolherLocal(novo) {
   mostrarEstado();
   Nuvens.definirLocal(local);
   Ceu.definirLocal(local);
+  Onibus.definirLocal(local);
   el.buscaCaixa.hidden = true;
   el.resultados.hidden = true;
   Previsao.gravarEstado({ avisado: false }).then(() => verificar());
@@ -484,7 +485,8 @@ async function buscarCidade() {
       small.textContent = c.detalhe;
       li.appendChild(small);
       li.addEventListener('click', () => escolherLocal({
-        nome: c.nome + (c.detalhe ? ' — ' + c.detalhe : ''), lat: c.lat, lon: c.lon
+        nome: c.nome + (c.detalhe ? ' — ' + c.detalhe : ''), lat: c.lat, lon: c.lon,
+        cidade: c.nome, estado: c.estado
       }));
       el.resultados.appendChild(li);
     }
@@ -570,6 +572,8 @@ Nuvens.iniciar();
 Nuvens.definirLocal(local);
 Ceu.iniciar();
 Ceu.definirLocal(local);
+Onibus.iniciar();
+Onibus.definirLocal(local);
 mostrarLocal();
 mostrarEstado();
 salvar();

@@ -327,10 +327,19 @@ a { color: var(--acento-texto); }
 .ceu-lista li.destaque { border-color: var(--perigo); }
 .ceu-lista span { color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
 
+/* ——— ônibus ——— */
+.onibus-caixa { margin-top: 18px; }
+.onibus-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.onibus-links .botao { text-align: center; text-decoration: none; padding: 12px 10px; font-size: 14px; }
+.onibus-links .botao:first-child { grid-column: 1 / -1; background: var(--acento); border-color: var(--acento); color: #fff; }
+.onibus-links .botao:last-child { grid-column: 1 / -1; }
+.onibus-links [aria-disabled] { opacity: .45; pointer-events: none; }
+
 /* ——— barras por hora ——— */
 .horas-caixa { margin-top: 18px; }
 .nuvens-caixa h2,
 .ceu-caixa h2,
+.onibus-caixa h2,
 .tempo-caixa h2,
 .horas-caixa h2,
 .ajustes h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--texto-fraco); }
