@@ -166,6 +166,22 @@
     </p>
   </section>
 
+  <section class="onibus-caixa">
+    <h2 id="onibus-titulo">Ônibus saindo da cidade</h2>
+    <div class="onibus-links">
+      <a class="botao" data-onibus="horarios" target="_blank" rel="noopener">🚌 Horários e rodoviária</a>
+      <a class="botao" data-onibus="clickbus" target="_blank" rel="noopener">ClickBus</a>
+      <a class="botao" data-onibus="queropassagem" target="_blank" rel="noopener">Quero Passagem</a>
+      <a class="botao" data-onibus="mapa" target="_blank" rel="noopener">📍 Rodoviária no mapa</a>
+    </div>
+    <p class="nuvens-aviso" id="onibus-aviso"></p>
+    <p class="nuvens-legenda">
+      Não existe fonte aberta com as partidas e chegadas das rodoviárias no Brasil (nem em tempo real).
+      Os botões abrem a busca já com a cidade escolhida; nos sites de passagens aparecem os horários
+      à venda, com as empresas que atendem a cidade.
+    </p>
+  </section>
+
   <section class="horas-caixa">
     <h2>Próximas 12 horas</h2>
     <ol class="horas" id="horas"></ol>
@@ -235,6 +251,7 @@
 <script src="nuvens.js"></script>
 <script src="vendor/satellite.min.js"></script>
 <script src="ceu.js"></script>
+<script src="onibus.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

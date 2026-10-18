@@ -46,6 +46,7 @@ const Previsao = (() => {
     return (dados.results || []).map(r => ({
       nome: r.name,
       detalhe: [r.admin1, r.country].filter(Boolean).join(', '),
+      estado: r.admin1 || '',
       lat: r.latitude,
       lon: r.longitude
     }));

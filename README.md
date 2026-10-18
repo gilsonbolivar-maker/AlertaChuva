@@ -61,6 +61,14 @@ mais vezes que a atualização deles). Os aviões só são consultados com a se�
 tela e o app aberto. Onde não há receptor ADS‑B de voluntário por perto, o avião
 não aparece.
 
+## Ônibus
+
+Não há fonte aberta de partidas e chegadas das rodoviárias brasileiras. A seção
+mostra atalhos com a cidade escolhida: busca de horários, ClickBus e Quero Passagem
+(busca do Google restrita ao site, que leva à página da cidade) e a rodoviária no
+Google Maps. Com local de GPS, a cidade vem do [Nominatim](https://nominatim.org/)
+(OpenStreetMap), uma consulta por local.
+
 Granizo não vem pronto na previsão: **alto** = código 96/99 (só marcado em parte
 do mundo) ou trovoada com CAPE ≥ 2500; **possível** = trovoada ou CAPE ≥ 1500.
 É um indício, não certeza.
@@ -101,6 +109,7 @@ app.js                local, ajustes, consultas, disparo e som
 nuvens.js             quadro do satélite (NASA GIBS, GOES-16)
 ceu.js                aviões (ADS-B) e satélites (CelesTrak + satellite.js)
 vendor/               satellite.js 5.0.0 (MIT)
+onibus.js             atalhos de ônibus da cidade (Nominatim para GPS)
 previsao.js           Open-Meteo, regra de decisão, granizo, lua e estado compartilhado com o SW
 sw.js                 app offline e conferência em segundo plano (Android)
 manifest.webmanifest  dados de instalação do PWA
