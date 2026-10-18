@@ -49,6 +49,18 @@ Imagem do satélite **GOES-16** pelo WMS do [NASA GIBS](https://earthdata.nasa.g
 O satélite tem 1 a 2 km por ponto: na vista de 20 km a imagem fica granulada.
 A imagem chega ao GIBS com uns 20–40 min de atraso; o app procura a mais nova que já existe.
 
+## Céu agora
+
+| Aba | O que mostra | Fonte |
+|---|---|---|
+| ✈️ Aviões | radar visto de cima (50 / 150 / 300 km), voo, tipo, altitude, velocidade e direção; a cada 15 s | ADS‑B comunitário: [adsb.lol](https://adsb.lol), reserva airplanes.live e OpenSky |
+| 🛰 Satélites | cúpula do céu (centro = zênite) com os satélites acima do horizonte e o rastro dos próximos 5 min; ISS, Tiangong e Hubble em vermelho | órbitas da [CelesTrak](https://celestrak.org) (grupos `stations` e `visual`), posição calculada no aparelho com [satellite.js](https://github.com/shashwatak/satellite-js) (MIT, em `vendor/`) |
+
+As órbitas ficam guardadas no aparelho por 6 h (a CelesTrak pede que não se baixe
+mais vezes que a atualização deles). Os aviões só são consultados com a seção na
+tela e o app aberto. Onde não há receptor ADS‑B de voluntário por perto, o avião
+não aparece.
+
 Granizo não vem pronto na previsão: **alto** = código 96/99 (só marcado em parte
 do mundo) ou trovoada com CAPE ≥ 2500; **possível** = trovoada ou CAPE ≥ 1500.
 É um indício, não certeza.
@@ -87,6 +99,8 @@ index.html            tela única: local, previsão, tempo agora, barras por hor
 app.css               estilos (tema escuro e claro)
 app.js                local, ajustes, consultas, disparo e som
 nuvens.js             quadro do satélite (NASA GIBS, GOES-16)
+ceu.js                aviões (ADS-B) e satélites (CelesTrak + satellite.js)
+vendor/               satellite.js 5.0.0 (MIT)
 previsao.js           Open-Meteo, regra de decisão, granizo, lua e estado compartilhado com o SW
 sw.js                 app offline e conferência em segundo plano (Android)
 manifest.webmanifest  dados de instalação do PWA

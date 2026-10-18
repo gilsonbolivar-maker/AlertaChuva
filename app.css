@@ -290,9 +290,47 @@ a { color: var(--acento-texto); }
 .pilula[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: #fff; }
 .pilula:disabled { opacity: .45; }
 
+/* ——— céu agora ——— */
+.ceu-caixa { margin-top: 18px; }
+.ceu-grafico {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-top: 10px;
+  border-radius: 18px;
+  background: radial-gradient(circle, #0f1d36, #05080f 75%);
+  border: 1px solid var(--borda);
+}
+.ceu-fundo circle, .ceu-fundo line { fill: none; stroke: rgba(147, 161, 189, .35); stroke-width: .5; }
+.ceu-anel { font-size: 6px; fill: rgba(147, 161, 189, .8); }
+.ceu-cardeal { font-size: 8px; font-weight: 700; fill: #e8edf7; }
+.ceu-eu { fill: #ff4d4d; }
+.aviao path { fill: #ffb020; stroke: #05080f; stroke-width: .6; }
+.aviao.no-chao path { fill: #93a1bd; }
+.ceu-rotulo { font-size: 6px; fill: #e8edf7; paint-order: stroke; stroke: #05080f; stroke-width: 1.5px; }
+.ceu-rotulo.destaque { fill: #ff8a80; font-weight: 700; }
+.sat { fill: #8fd3ff; }
+.sat.destaque { fill: #ff4d4d; stroke: #fff; stroke-width: .6; }
+.sat-rastro { fill: none; stroke: rgba(143, 211, 255, .45); stroke-width: .6; }
+.sat-rastro.destaque { stroke: rgba(255, 77, 77, .8); stroke-width: 1; }
+.ceu-estado { margin: 8px 0 0; font-size: 13px; color: var(--texto-fraco); }
+.ceu-lista { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+.ceu-lista li {
+  display: grid;
+  gap: 1px;
+  padding: 8px 12px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  font-size: 13px;
+}
+.ceu-lista li.destaque { border-color: var(--perigo); }
+.ceu-lista span { color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
+
 /* ——— barras por hora ——— */
 .horas-caixa { margin-top: 18px; }
 .nuvens-caixa h2,
+.ceu-caixa h2,
 .tempo-caixa h2,
 .horas-caixa h2,
 .ajustes h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--texto-fraco); }
