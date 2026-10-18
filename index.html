@@ -132,6 +132,40 @@
     </p>
   </section>
 
+  <section class="ceu-caixa" id="ceu">
+    <h2>Céu agora</h2>
+    <div class="seletor" role="group" aria-label="O que mostrar">
+      <button type="button" class="pilula" data-ceu-aba="avioes" aria-pressed="true">✈️ Aviões</button>
+      <button type="button" class="pilula" data-ceu-aba="satelites" aria-pressed="false">🛰 Satélites</button>
+    </div>
+
+    <div id="ceu-avioes">
+      <svg class="ceu-grafico" id="radar" role="img" aria-label="Radar com os aviões em volta do local"></svg>
+      <div class="seletor" role="group" aria-label="Alcance do radar">
+        <span>Alcance:</span>
+        <button type="button" class="pilula" data-ceu-raio="50" aria-pressed="false">50 km</button>
+        <button type="button" class="pilula" data-ceu-raio="150" aria-pressed="true">150 km</button>
+        <button type="button" class="pilula" data-ceu-raio="300" aria-pressed="false">300 km</button>
+      </div>
+      <p class="ceu-estado" id="estado-avioes">Escolha um local para ver os aviões.</p>
+      <ul class="ceu-lista" id="lista-avioes"></ul>
+    </div>
+
+    <div id="ceu-satelites" hidden>
+      <svg class="ceu-grafico" id="cupula" role="img" aria-label="O céu visto do local, com os satélites acima do horizonte"></svg>
+      <p class="ceu-estado" id="estado-satelites">Escolha um local para ver os satélites.</p>
+      <ul class="ceu-lista" id="lista-satelites"></ul>
+    </div>
+
+    <p class="nuvens-legenda">
+      <b>Aviões:</b> visto de cima, norte para cima; atualiza a cada 15 s. Vem do sinal ADS‑B que o
+      avião transmite, captado por voluntários (adsb.lol) — onde não há antena por perto, ele não aparece.
+      <b>Satélites:</b> o céu como uma cúpula — centro = bem em cima da sua cabeça, borda = horizonte;
+      o traço mostra os próximos 5 min. A olho nu só se veem no começo da noite ou antes do amanhecer.
+      Órbitas: <a href="https://celestrak.org/" target="_blank" rel="noopener">CelesTrak</a>.
+    </p>
+  </section>
+
   <section class="horas-caixa">
     <h2>Próximas 12 horas</h2>
     <ol class="horas" id="horas"></ol>
@@ -199,6 +233,8 @@
 
 <script src="previsao.js"></script>
 <script src="nuvens.js"></script>
+<script src="vendor/satellite.min.js"></script>
+<script src="ceu.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
    ———————————————————————————————————————————————————————————— */
 'use strict';
 
-const VERSAO = '1.2.2';   // precisa casar com a VERSAO do sw.js
+const VERSAO = '1.3.0';   // precisa casar com a VERSAO do sw.js
 
 // Versão sempre à vista: cada [data-versao] da página mostra a deste app.
 for (const lugar of document.querySelectorAll('[data-versao]')) lugar.textContent = 'v' + VERSAO;
@@ -440,6 +440,7 @@ function escolherLocal(novo) {
   mostrarLocal();
   mostrarEstado();
   Nuvens.definirLocal(local);
+  Ceu.definirLocal(local);
   el.buscaCaixa.hidden = true;
   el.resultados.hidden = true;
   Previsao.gravarEstado({ avisado: false }).then(() => verificar());
@@ -567,6 +568,8 @@ el.instalar.addEventListener('click', async () => {
 mostrarAjustes();
 Nuvens.iniciar();
 Nuvens.definirLocal(local);
+Ceu.iniciar();
+Ceu.definirLocal(local);
 mostrarLocal();
 mostrarEstado();
 salvar();
