@@ -102,6 +102,35 @@
     </div>
   </section>
 
+  <section class="nuvens-caixa">
+    <h2>Nuvens agora (satélite)</h2>
+    <div class="nuvens" id="nuvens" data-estado="vazio">
+      <img id="nuvens-img" alt="Imagem de satélite das nuvens em volta do local">
+      <div class="nuvens-circulo" id="nuvens-circulo"></div>
+      <div class="nuvens-centro" aria-hidden="true"></div>
+      <p class="nuvens-hora" id="nuvens-hora"></p>
+    </div>
+    <p class="nuvens-aviso" id="nuvens-aviso">Escolha um local para ver as nuvens.</p>
+    <div class="seletor" role="group" aria-label="Tipo de imagem">
+      <button type="button" class="pilula" data-nuvens-camada="infra" aria-pressed="true">Infravermelho</button>
+      <button type="button" class="pilula" data-nuvens-camada="visivel" aria-pressed="false">Visível</button>
+      <button type="button" class="pilula" id="nuvens-tocar" disabled>▶ Última hora</button>
+    </div>
+    <div class="seletor" role="group" aria-label="Largura da vista">
+      <span>Vista:</span>
+      <button type="button" class="pilula" data-nuvens-largura="20" aria-pressed="false">20 km</button>
+      <button type="button" class="pilula" data-nuvens-largura="60" aria-pressed="true">60 km</button>
+      <button type="button" class="pilula" data-nuvens-largura="150" aria-pressed="false">150 km</button>
+      <button type="button" class="pilula" data-nuvens-largura="400" aria-pressed="false">400 km</button>
+    </div>
+    <p class="nuvens-legenda">
+      <b>Círculo</b> = 20 km em volta do local · <b>+</b> = o local.
+      No infravermelho, quanto mais <b>colorida</b> a nuvem, mais alta e fria — é a que costuma
+      dar chuva forte e trovoada. Imagem: GOES‑16 via
+      <a href="https://earthdata.nasa.gov/gibs" target="_blank" rel="noopener">NASA GIBS</a>.
+    </p>
+  </section>
+
   <section class="horas-caixa">
     <h2>Próximas 12 horas</h2>
     <ol class="horas" id="horas"></ol>
@@ -168,6 +197,7 @@
 <div class="aviso" id="toast" hidden></div>
 
 <script src="previsao.js"></script>
+<script src="nuvens.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

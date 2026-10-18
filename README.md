@@ -34,6 +34,21 @@ Com risco alto de **granizo** no prazo, o alerta acrescenta "Risco de granizo!".
 | Lua | fase e % iluminada | **calculada no aparelho**, sem rede |
 | Granizo | baixo / possível / alto | código 95/96/99 + CAPE |
 
+## Nuvens agora (satélite)
+
+Imagem do satélite **GOES-16** pelo WMS do [NASA GIBS](https://earthdata.nasa.gov/gibs)
+(gratuito, sem chave, imagem nova a cada 10 min), centrada no local.
+
+| Botão | O que faz |
+|---|---|
+| Infravermelho | topo de nuvem frio = colorido (chuva forte); dia e noite |
+| Visível | foto das nuvens; só com sol |
+| ▶ Última hora | anima as 6 últimas imagens, para ver a formação se mexendo |
+| Vista 20 / 60 / 150 / 400 km | largura da imagem; o círculo tracejado marca sempre 20 km |
+
+O satélite tem 1 a 2 km por ponto: na vista de 20 km a imagem fica granulada.
+A imagem chega ao GIBS com uns 20–40 min de atraso; o app procura a mais nova que já existe.
+
 Granizo não vem pronto na previsão: **alto** = código 96/99 (só marcado em parte
 do mundo) ou trovoada com CAPE ≥ 2500; **possível** = trovoada ou CAPE ≥ 1500.
 É um indício, não certeza.
@@ -71,6 +86,7 @@ aparece ao lado do título. Toda mudança sobe a versão no mesmo commit: corre�
 index.html            tela única: local, previsão, tempo agora, barras por hora, ajustes e alerta
 app.css               estilos (tema escuro e claro)
 app.js                local, ajustes, consultas, disparo e som
+nuvens.js             quadro do satélite (NASA GIBS, GOES-16)
 previsao.js           Open-Meteo, regra de decisão, granizo, lua e estado compartilhado com o SW
 sw.js                 app offline e conferência em segundo plano (Android)
 manifest.webmanifest  dados de instalação do PWA
