@@ -7,7 +7,7 @@
 
 importScripts('previsao.js');
 
-const VERSAO = '1.2.0';   // precisa casar com a VERSAO do app.js
+const VERSAO = '1.2.1';   // precisa casar com a VERSAO do app.js
 const CACHE_APP = 'alerta-chuva-app-' + VERSAO;
 
 const ARQUIVOS = [
@@ -26,8 +26,10 @@ const ARQUIVOS = [
 
 self.addEventListener('install', ev => {
   ev.waitUntil(
+    // cache: 'reload' pula o cache HTTP do navegador: sem isso a versão nova
+    // podia guardar arquivos da anterior (o GitHub Pages manda guardar por 10 min).
     caches.open(CACHE_APP)
-      .then(c => c.addAll(ARQUIVOS))
+      .then(c => c.addAll(ARQUIVOS.map(a => new Request(a, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
@@ -49,18 +51,15 @@ self.addEventListener('fetch', ev => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;   // previsão e busca sempre na rede
 
-  // Arquivos do app: responde do cache e atualiza por trás.
+  // Arquivos do app: rede primeiro (versão nova na hora), cache só sem internet.
   ev.respondWith(
-    caches.match(req).then(guardado => {
-      const rede = fetch(req).then(resp => {
-        if (resp && resp.ok) {
-          const copia = resp.clone();
-          caches.open(CACHE_APP).then(c => c.put(req, copia));
-        }
-        return resp;
-      }).catch(() => guardado);
-      return guardado || rede;
-    })
+    fetch(req, { cache: 'no-cache' }).then(resp => {
+      if (resp && resp.ok) {
+        const copia = resp.clone();
+        caches.open(CACHE_APP).then(c => c.put(req, copia));
+      }
+      return resp;
+    }).catch(() => caches.match(req, { ignoreSearch: true }))
   );
 });
 
