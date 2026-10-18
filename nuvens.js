@@ -19,9 +19,12 @@ const Nuvens = (() => {
     infra: 'GOES-East_ABI_Band13_Clean_Infrared',
     visivel: 'GOES-East_ABI_Band2_Red_Visible_1km'
   };
-  const REFERENCIA = 'Reference_Features_15m';   // estradas e divisas, por cima
+  const REFERENCIA = 'Reference_Features_15m';   // estradas e divisas, numa imagem por cima
   const PASSO = 10 * 60 * 1000;                  // o satélite manda uma imagem a cada 10 min
-  const ATRASO = 30 * 60 * 1000;                 // folga até a imagem chegar ao GIBS
+  const ATRASO = 20 * 60 * 1000;                 // folga mínima até a imagem chegar ao GIBS
+  // Quanto recuar (em passos de 10 min) procurando uma imagem que já tenha chegado:
+  // de 20 min até 3 h atrás, mais denso no começo.
+  const RECUOS = [0, 1, 2, 3, 4, 5, 7, 9, 12, 16];
   const QUADROS = 6;                             // animação: a última hora
   const LADO = 512;
 
@@ -39,6 +42,7 @@ const Nuvens = (() => {
     el = {
       caixa: $('nuvens'),
       imagem: $('nuvens-img'),
+      referencia: $('nuvens-ref'),
       circulo: $('nuvens-circulo'),
       hora: $('nuvens-hora'),
       aviso: $('nuvens-aviso'),
@@ -62,26 +66,32 @@ const Nuvens = (() => {
     return [lat - dLat, lon - dLon, lat + dLat, lon + dLon];   // ordem do WMS 1.3.0 em EPSG:4326
   }
 
-  function endereco(t) {
+  /**
+   * Endereço WMS. Com TRANSPARENT o GIBS devolve "sem dados" como pixel
+   * transparente — é assim que dá para perceber uma imagem que ainda não chegou
+   * (ele não responde erro: manda a imagem vazia).
+   */
+  function endereco(camadaWms, t) {
     const p = new URLSearchParams({
       SERVICE: 'WMS',
       REQUEST: 'GetMap',
       VERSION: '1.3.0',
-      LAYERS: CAMADAS[camada] + ',' + REFERENCIA,
+      LAYERS: camadaWms,
       CRS: 'EPSG:4326',
       BBOX: caixa(local.lat, local.lon, largura).map(v => v.toFixed(4)).join(','),
       WIDTH: String(LADO),
       HEIGHT: String(LADO),
       FORMAT: 'image/png',
-      TRANSPARENT: 'FALSE',
-      TIME: new Date(t).toISOString().slice(0, 19) + 'Z'
+      TRANSPARENT: 'TRUE'
     });
+    if (t) p.set('TIME', new Date(t).toISOString().slice(0, 19) + 'Z');
     return WMS + '?' + p;
   }
 
   function carregarImagem(url) {
     return new Promise((ok, falha) => {
       const img = new Image();
+      img.crossOrigin = 'anonymous';   // o GIBS libera CORS; sem isso não dá para olhar os pixels
       img.decoding = 'async';
       img.onload = () => ok(img);
       img.onerror = falha;
@@ -89,15 +99,40 @@ const Nuvens = (() => {
     });
   }
 
-  /** Acha a imagem mais nova que já existe, recuando de 10 em 10 min. */
+  /** Vazia = quase tudo transparente ou preto (sem dados naquele horário). */
+  function vazia(img) {
+    try {
+      const c = document.createElement('canvas');
+      c.width = c.height = 48;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, 0, 0, 48, 48);
+      const px = g.getImageData(0, 0, 48, 48).data;
+      let cheios = 0;
+      for (let i = 0; i < px.length; i += 4) {
+        if (px[i + 3] > 20 && px[i] + px[i + 1] + px[i + 2] > 24) cheios++;
+      }
+      return cheios < (48 * 48) * 0.05;
+    } catch (e) {
+      return false;   // não deu para olhar: confia na imagem
+    }
+  }
+
+  async function imagemCom(t) {
+    const img = await carregarImagem(endereco(CAMADAS[camada], t));
+    if (vazia(img)) throw new Error('vazia');
+    return img;
+  }
+
+  /** Acha a imagem mais nova que já chegou, recuando até 3 h. */
   async function maisRecente(gen) {
-    let t = Math.floor((Date.now() - ATRASO) / PASSO) * PASSO;
-    for (let tentativa = 0; tentativa < 4; tentativa++, t -= PASSO) {
+    const base = Math.floor((Date.now() - ATRASO) / PASSO) * PASSO;
+    for (const r of RECUOS) {
+      if (gen !== geracao) return null;
+      const t = base - r * PASSO;
       try {
-        const img = await carregarImagem(endereco(t));
-        if (gen === geracao) return { t, img };
-        return null;
-      } catch (e) { /* ainda não chegou: tenta 10 min antes */ }
+        const img = await imagemCom(t);
+        return gen === geracao ? { t, img } : null;
+      } catch (e) { /* ainda não chegou ou veio vazia: tenta mais cedo */ }
     }
     throw new Error('sem imagem');
   }
@@ -110,6 +145,7 @@ const Nuvens = (() => {
     desenharCirculo();
     el.caixa.dataset.estado = 'carregando';
     el.aviso.textContent = 'Buscando a imagem do satélite…';
+    el.referencia.src = endereco(REFERENCIA);   // estradas e divisas não mudam com a hora
     try {
       const ultimo = await maisRecente(gen);
       if (!ultimo) return;
@@ -123,7 +159,7 @@ const Nuvens = (() => {
       // A hora anterior, para a animação, vem por trás.
       for (let i = 1; i < QUADROS; i++) {
         const t = ultimo.t - i * PASSO;
-        carregarImagem(endereco(t)).then(img => {
+        imagemCom(t).then(img => {
           if (gen !== geracao) return;
           quadros.push({ t, img });
           quadros.sort((a, b) => a.t - b.t);
@@ -136,7 +172,9 @@ const Nuvens = (() => {
       el.caixa.dataset.estado = 'erro';
       el.aviso.textContent = navigator.onLine === false
         ? 'Sem internet: a imagem do satélite precisa de rede.'
-        : 'O serviço de imagens do satélite não respondeu. Tente de novo mais tarde.';
+        : camada === 'visivel' && escuroNoLocal(Date.now())
+          ? 'É noite no local: a imagem visível não existe agora. Use Infravermelho.'
+          : 'O satélite não mandou imagem desta área nas últimas 3 horas. Tente de novo mais tarde.';
     }
   }
 
