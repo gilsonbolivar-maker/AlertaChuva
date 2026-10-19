@@ -74,6 +74,15 @@ mostra atalhos com a cidade escolhida: busca de horários, ClickBus e Quero Pass
 Google Maps. Com local de GPS, a cidade vem do [Nominatim](https://nominatim.org/)
 (OpenStreetMap), uma consulta por local.
 
+## Bússola
+
+O quadro de nuvens, o radar de aviões e a cúpula de satélites ganham uma rosa no canto
+com a agulha no **norte verdadeiro**: o sensor do celular (`deviceorientationabsolute` no
+Android, `webkitCompassHeading` no iOS, que pede permissão num toque) dá o rumo magnético,
+e o app soma a declinação do local pelo modelo **WMM2025** (pacote
+[geomagnetism](https://github.com/naturalatlas/geomagnetism) 0.2.0, Apache‑2.0, em
+`vendor/geomag.min.js`; ‑23° na Bahia). **Girar com o celular** gira o mapa junto.
+
 Granizo não vem pronto na previsão: **alto** = código 96/99 (só marcado em parte
 do mundo) ou trovoada com CAPE ≥ 2500; **possível** = trovoada ou CAPE ≥ 1500.
 É um indício, não certeza.
@@ -113,7 +122,8 @@ app.css               estilos (tema escuro e claro)
 app.js                local, ajustes, consultas, disparo e som
 nuvens.js             quadro do satélite (NASA GIBS, GOES-16)
 ceu.js                aviões (ADS-B) e satélites (CelesTrak + satellite.js)
-vendor/               satellite.js 5.0.0 (MIT)
+bussola.js            bússola (sensor + declinação WMM2025)
+vendor/               satellite.js 5.0.0 (MIT), geomag (WMM2025, Apache-2.0)
 onibus.js             atalhos de ônibus da cidade (Nominatim para GPS)
 previsao.js           Open-Meteo, regra de decisão, granizo, lua e estado compartilhado com o SW
 sw.js                 app offline e conferência em segundo plano (Android)
