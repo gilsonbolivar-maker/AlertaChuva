@@ -104,13 +104,21 @@
 
   <section class="nuvens-caixa">
     <h2>Nuvens agora (satélite)</h2>
-    <div class="nuvens" id="nuvens" data-estado="vazio">
-      <img id="nuvens-img" alt="Imagem de satélite das nuvens em volta do local">
-      <img id="nuvens-ref" class="nuvens-ref" alt="">
-      <div class="nuvens-circulo" id="nuvens-circulo"></div>
+    <div class="nuvens" id="nuvens" data-estado="vazio" data-bussola-quadro>
+      <div class="nuvens-giro" data-bussola-giro>
+        <img id="nuvens-img" alt="Imagem de satélite das nuvens em volta do local">
+        <img id="nuvens-ref" class="nuvens-ref" alt="">
+        <div class="nuvens-circulo" id="nuvens-circulo"></div>
+        <div class="nuvens-norte" aria-hidden="true">N</div>
+      </div>
       <div class="nuvens-centro" aria-hidden="true"></div>
       <p class="nuvens-hora" id="nuvens-hora"></p>
     </div>
+    <div class="seletor">
+      <button type="button" class="pilula" data-bussola="ligar" aria-pressed="false">🧭 Ligar bússola</button>
+      <button type="button" class="pilula" data-bussola="girar" aria-pressed="false" hidden>🔄 Girar com o celular</button>
+    </div>
+    <p class="nuvens-aviso" data-bussola-aviso></p>
     <p class="nuvens-aviso" id="nuvens-aviso">Escolha um local para ver as nuvens.</p>
     <div class="seletor" role="group" aria-label="Tipo de imagem">
       <button type="button" class="pilula" data-nuvens-camada="infra" aria-pressed="true">Infravermelho</button>
@@ -138,9 +146,16 @@
       <button type="button" class="pilula" data-ceu-aba="avioes" aria-pressed="true">✈️ Aviões</button>
       <button type="button" class="pilula" data-ceu-aba="satelites" aria-pressed="false">🛰 Satélites</button>
     </div>
+    <div class="seletor">
+      <button type="button" class="pilula" data-bussola="ligar" aria-pressed="false">🧭 Ligar bússola</button>
+      <button type="button" class="pilula" data-bussola="girar" aria-pressed="false" hidden>🔄 Girar com o celular</button>
+    </div>
+    <p class="nuvens-aviso" data-bussola-aviso></p>
 
     <div id="ceu-avioes">
-      <svg class="ceu-grafico" id="radar" role="img" aria-label="Radar com os aviões em volta do local"></svg>
+      <div class="ceu-moldura" data-bussola-quadro>
+        <svg class="ceu-grafico" id="radar" data-bussola-giro role="img" aria-label="Radar com os aviões em volta do local"></svg>
+      </div>
       <div class="seletor" role="group" aria-label="Alcance do radar">
         <span>Alcance:</span>
         <button type="button" class="pilula" data-ceu-raio="50" aria-pressed="false">50 km</button>
@@ -152,7 +167,9 @@
     </div>
 
     <div id="ceu-satelites" hidden>
-      <svg class="ceu-grafico" id="cupula" role="img" aria-label="O céu visto do local, com os satélites acima do horizonte"></svg>
+      <div class="ceu-moldura" data-bussola-quadro>
+        <svg class="ceu-grafico" id="cupula" data-bussola-giro role="img" aria-label="O céu visto do local, com os satélites acima do horizonte"></svg>
+      </div>
       <div class="seletor">
         <button type="button" class="pilula" id="ceu-lixo" aria-pressed="false">🗑 Lixo espacial</button>
       </div>
@@ -167,6 +184,9 @@
       avião transmite, captado por voluntários (adsb.lol) — onde não há antena por perto, ele não aparece.
       <b>Satélites:</b> o céu como uma cúpula — centro = bem em cima da sua cabeça, borda = horizonte;
       o traço mostra os próximos 5 min. A olho nu só se veem no começo da noite ou antes do amanhecer.
+      <b>Bússola:</b> a agulha vermelha aponta o norte verdadeiro (o sensor do celular dá o
+      magnético; o app corrige pela declinação do local, ‑23° na Bahia). Afaste de ímãs e capas
+      magnéticas; se errar, faça um “8” no ar com o celular para calibrar.
       <b>Lixo espacial</b> (pontos cinza): detritos rastreados, de mais de ~10 cm, de dois testes
       antissatélite (China 2007, Rússia 2021) e da colisão Iridium × Cosmos (2009) — pequenos demais para ver a olho nu.
       Órbitas: <a href="https://celestrak.org/" target="_blank" rel="noopener">CelesTrak</a>.
@@ -259,6 +279,8 @@
 <script src="vendor/satellite.min.js"></script>
 <script src="ceu.js"></script>
 <script src="onibus.js"></script>
+<script src="vendor/geomag.min.js"></script>
+<script src="bussola.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
    ———————————————————————————————————————————————————————————— */
 'use strict';
 
-const VERSAO = '1.5.0';   // precisa casar com a VERSAO do sw.js
+const VERSAO = '1.6.0';   // precisa casar com a VERSAO do sw.js
 
 // Versão sempre à vista: cada [data-versao] da página mostra a deste app.
 for (const lugar of document.querySelectorAll('[data-versao]')) lugar.textContent = 'v' + VERSAO;
@@ -441,6 +441,7 @@ function escolherLocal(novo) {
   mostrarEstado();
   Nuvens.definirLocal(local);
   Ceu.definirLocal(local);
+  Bussola.definirLocal(local);
   Onibus.definirLocal(local);
   el.buscaCaixa.hidden = true;
   el.resultados.hidden = true;
@@ -572,6 +573,8 @@ Nuvens.iniciar();
 Nuvens.definirLocal(local);
 Ceu.iniciar();
 Ceu.definirLocal(local);
+Bussola.iniciar();
+Bussola.definirLocal(local);
 Onibus.iniciar();
 Onibus.definirLocal(local);
 mostrarLocal();

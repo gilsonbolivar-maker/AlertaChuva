@@ -7,7 +7,7 @@
 
 importScripts('previsao.js');
 
-const VERSAO = '1.5.0';   // precisa casar com a VERSAO do app.js
+const VERSAO = '1.6.0';   // precisa casar com a VERSAO do app.js
 const CACHE_APP = 'alerta-chuva-app-' + VERSAO;
 
 const ARQUIVOS = [
@@ -19,6 +19,8 @@ const ARQUIVOS = [
   'nuvens.js',
   'ceu.js',
   'onibus.js',
+  'bussola.js',
+  'vendor/geomag.min.js',
   'vendor/satellite.min.js',
   'manifest.webmanifest',
   'icones/icone-180.png',
